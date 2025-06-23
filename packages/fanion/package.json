@@ -1,0 +1,25 @@
+{
+  "name": "fanion",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Feature flagging library for Node.js",
+  "keywords": [
+    "feature",
+    "flag",
+    "feature-flag",
+    "feature-toggle",
+    "feature-flags",
+    "flag",
+    "toggle"
+  ],
+  "main": "build/index.js",
+  "scripts": {
+    "test": "NODE_NO_WARNINGS=1 node --enable-source-maps --loader=ts-node/esm bin/test.ts",
+    "coverage": "c8 node --loader=ts-node/esm bin/test.ts",
+    "lint": "biome lint ."
+  },
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.11.0",
+  "devDependencies": {}
+}

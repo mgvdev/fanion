@@ -1,0 +1,25 @@
+{
+  "name": "@fanion/monorepo",
+  "version": "1.0.0",
+  "description": "Feature flagging library for Node.js",
+  "private": true,
+  "packageManager": "pnpm@10.11.0",
+  "author": "Maxence Guyonvarho <contact@mgvdev.io>",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "@adonisjs/tsconfig": "^1.4.1",
+    "@biomejs/biome": "2.0.5",
+    "@japa/expect": "^2.0.2",
+    "@japa/runner": "^2.5.1",
+    "@japa/spec-reporter": "^1.3.3",
+    "@swc/core": "^1.12.5",
+    "c8": "^10.1.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}

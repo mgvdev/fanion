@@ -1,0 +1,14 @@
+{
+  "extends": "@adonisjs/tsconfig/tsconfig.package.json",
+  "target": "ESNext",
+  "module": "NodeNext",
+  "lib": ["ESNext"],
+  "compilerOptions": {
+    "rootDir": "./",
+    "allowJs": true,
+    "outDir": "build"
+  },
+  "ts-node": {
+    "swc": true
+  }
+}
