@@ -13,7 +13,16 @@
     "toggle"
   ],
   "main": "build/index.js",
+  "exports": {
+    ".": "./build/index.js"
+  },
+  "files": [
+    "build"
+  ],
   "scripts": {
+    "clean": "del-cli build",
+    "typecheck": "tsc --noEmit",
+    "build": "pnpm clean && tsup-node",
     "test": "NODE_NO_WARNINGS=1 node --enable-source-maps --loader=ts-node/esm bin/test.ts",
     "coverage": "c8 node --loader=ts-node/esm bin/test.ts",
     "lint": "biome lint ."
