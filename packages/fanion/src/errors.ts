@@ -6,3 +6,12 @@ export class FeatureNotExistsError extends Error {
     super(`Feature ${featureName} does not exists`);
   }
 }
+
+/**
+ * Error return when feature manager database provider is not enabled
+ */
+export class ProviderNotDefined extends Error {
+  constructor() {
+    super("Database provider not defined");
+  }
+}

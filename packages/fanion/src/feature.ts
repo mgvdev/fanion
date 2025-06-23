@@ -1,15 +1,15 @@
 import { FeatureNotExistsError } from "./errors.js";
-import type { FeatureCacheProvider } from "./types/feature_cache_provider.js";
-import type { FeatureCheck, FeatureProvider } from "./types/provider.js";
+import type { FeatureStorageProvider } from "./types/feature_storage_provider.js";
+import type { FeatureCheck, FeatureManagerProvider } from "./types/provider.js";
 
-export function featureManager(config?: { store: FeatureCacheProvider }) {
+export function featureManager(config?: { store: FeatureStorageProvider }) {
   return new FeatureManager(config);
 }
 
 /**
  * A feature provider is a class that can be used to retrieve feature flags.
  */
-export class FeatureManager implements FeatureProvider {
+export class FeatureManager implements FeatureManagerProvider {
   /**
    * Map to store feature flag check functions
    */
@@ -18,10 +18,10 @@ export class FeatureManager implements FeatureProvider {
   /**
    * The cache provider used to store feature flag results
    */
-  #store: FeatureCacheProvider | undefined;
+  protected store: FeatureStorageProvider | undefined;
 
-  constructor(config?: { store: FeatureCacheProvider }) {
-    this.#store = config?.store;
+  constructor(config?: { store: FeatureStorageProvider }) {
+    this.store = config?.store;
     this.featureMap = new Map<string, FeatureCheck | undefined>();
   }
 
@@ -39,6 +39,20 @@ export class FeatureManager implements FeatureProvider {
   }
 
   /**
+   * Define a feature flag and store it in the database provider.
+   *
+   * @param flagName
+   * @param defaultValue
+   */
+  defineAndStore(flagName: string, defaultValue = true): void {
+    if (!this.store) {
+      throw new Error("No store provider defined");
+    }
+
+    this.store.set(flagName, defaultValue);
+  }
+
+  /**
    * Check if a feature flag is enabled for a given context
    *
    * @param flagName The name of the feature flag.
@@ -49,6 +63,13 @@ export class FeatureManager implements FeatureProvider {
    */
   async active<T>(flagName: string, context?: T): Promise<boolean> {
     if (!this.featureMap.has(flagName)) {
+      if (this.store) {
+        const result = await this.store.get(flagName);
+        if (result !== undefined) {
+          return result;
+        }
+      }
+
       throw new FeatureNotExistsError(
         `Feature flag '${flagName}' is not defined`,
       );
