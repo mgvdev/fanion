@@ -2,6 +2,8 @@
 
 > A lightweight, flexible feature flagging library for Node.js applications
 
+![banner](https://repository-images.githubusercontent.com/1007337927/4c50e881-0935-4d0b-bb39-0a8a87a57ec6)
+
 Fanion is a modern feature flagging library that allows you to control feature rollouts, conduct A/B tests, and manage application behavior dynamically. Built with TypeScript and designed for simplicity and performance.
 
 ## Features
