@@ -1,7 +1,7 @@
 {
   "name": "fanion",
   "type": "module",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Feature flagging library for Node.js",
   "keywords": [
     "feature",
