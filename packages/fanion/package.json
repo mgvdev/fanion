@@ -1,7 +1,7 @@
 {
   "name": "fanion",
   "type": "module",
-  "version": "1.0.0",
+  "version": "0.4.0",
   "description": "Feature flagging library for Node.js",
   "keywords": [
     "feature",
@@ -25,10 +25,23 @@
     "build": "pnpm clean && tsup-node",
     "test": "NODE_NO_WARNINGS=1 node --enable-source-maps --loader=ts-node/esm bin/test.ts",
     "coverage": "c8 node --loader=ts-node/esm bin/test.ts",
-    "lint": "biome lint ."
+    "lint": "biome lint .",
+    "release": "pnpm build && pnpm release-it"
   },
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.11.0",
-  "devDependencies": {}
+  "devDependencies": {},
+  "release-it": {
+    "git": {
+      "commitMessage": "chore(release): fanion@${version}",
+      "tagAnnotation": "release ${version}",
+      "tagName": "fanion@${version}"
+    },
+    "github": {
+      "release": true,
+      "releaseName": "fanion@${version}",
+      "web": true
+    }
+  }
 }

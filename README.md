@@ -138,11 +138,11 @@ class RedisStorage implements FeatureStorageProvider {
   async set(flag: string, value: boolean): Promise<void> {
     // Implement Redis storage
   }
-  
+
   async get(flag: string): Promise<boolean | undefined> {
     // Implement Redis retrieval
   }
-  
+
   async delete(featureName: string): Promise<void> {
     // Implement Redis deletion
   }
@@ -195,18 +195,18 @@ features.define('debug-mode', () => {
 ### Complex Business Logic
 
 ```typescript
-features.define('enterprise-features', async (context: { 
-  user: { id: number; plan: string; createdAt: Date } 
+features.define('enterprise-features', async (context: {
+  user: { id: number; plan: string; createdAt: Date }
 }) => {
   const { user } = context;
-  
+
   // Multiple conditions
   if (user.plan !== 'enterprise') return false;
-  
+
   // Check account age
   const accountAge = Date.now() - user.createdAt.getTime();
   const thirtyDays = 30 * 24 * 60 * 60 * 1000;
-  
+
   return accountAge > thirtyDays;
 });
 ```
@@ -295,14 +295,14 @@ features.define('rate-limiting', (ctx: { ip: string }) => {
 });
 
 app.use(async (req, res, next) => {
-  const shouldRateLimit = await features.active('rate-limiting', { 
-    ip: req.ip 
+  const shouldRateLimit = await features.active('rate-limiting', {
+    ip: req.ip
   });
-  
+
   if (shouldRateLimit) {
     // Apply rate limiting middleware
   }
-  
+
   next();
 });
 ```
@@ -326,7 +326,7 @@ export async function getServerSideProps(context) {
   const showBetaFeatures = await features.active('beta-features', {
     user: context.user
   });
-  
+
   return {
     props: { showBetaFeatures }
   };
