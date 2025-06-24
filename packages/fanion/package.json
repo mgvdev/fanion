@@ -25,7 +25,7 @@
     "build": "pnpm clean && tsup-node",
     "test": "NODE_NO_WARNINGS=1 node --enable-source-maps --loader=ts-node/esm bin/test.ts",
     "coverage": "c8 node --loader=ts-node/esm bin/test.ts",
-    "lint": "biome lint .",
+    "lint": "biome lint . --config-path=../../biome.json",
     "release": "pnpm build && pnpm release-it"
   },
   "repository": {
@@ -35,7 +35,11 @@
   "author": "Maxence Guyonvarho <contact@mgvdev.io>",
   "license": "MIT",
   "packageManager": "pnpm@10.11.0",
-  "devDependencies": {},
+  "devDependencies": {
+    "better-sqlite3": "^12.1.0",
+    "knex": "^3.1.0",
+    "sqlite3": "^5.1.7"
+  },
   "release-it": {
     "git": {
       "commitMessage": "chore(release): fanion@${version}",
@@ -47,5 +51,8 @@
       "releaseName": "fanion@${version}",
       "web": true
     }
+  },
+  "peerDependencies": {
+    "knex": "^3.1.0"
   }
 }

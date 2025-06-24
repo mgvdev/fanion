@@ -21,4 +21,12 @@ export class InMemoryDriver implements FeatureStorageProvider {
   async delete(featureName: string): Promise<void> {
     this.#storage.delete(featureName);
   }
+
+  isDatabaseDriver(): boolean {
+    return false;
+  }
+
+  initStore(): Promise<void> {
+    return Promise.resolve();
+  }
 }

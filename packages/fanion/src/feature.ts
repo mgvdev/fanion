@@ -6,6 +6,12 @@ export function featureManager(config?: { store: FeatureStorageProvider }) {
   return new FeatureManager(config);
 }
 
+export async function featureManagerWithDatabase(config: {
+  store: FeatureStorageProvider;
+}) {
+  return await FeatureManager.initWithDatabase(config);
+}
+
 /**
  * A feature provider is a class that can be used to retrieve feature flags.
  */
@@ -23,6 +29,38 @@ export class FeatureManager implements FeatureManagerProvider {
   constructor(config?: { store: FeatureStorageProvider }) {
     this.store = config?.store;
     this.featureMap = new Map<string, FeatureCheck | undefined>();
+  }
+
+  /**
+   * Initialize a feature manager with a database provider.
+   *
+   * @param config The configuration object for the feature manager.
+   * @param config.store The database provider to use for storing feature flags
+   *
+   * @returns A new feature manager instance.
+   *
+   * @example
+   * ```ts
+   * const featureManager = FeatureManager.initWithDatabase({
+   *   store: new RedisFeatureStorageProvider(),
+   * });
+   * ````
+   */
+  static async initWithDatabase(config: { store: FeatureStorageProvider }) {
+    const featureManager = new FeatureManager(config);
+    await featureManager.initStore();
+    return featureManager;
+  }
+
+  /**
+   * If a store need to be initialised (database connexion, redis...)
+   * You must launch this method
+   *
+   * You can use FeatureManager.initWithDatabase() to init a manager and
+   * database in same time
+   */
+  public async initStore() {
+    await this.store?.initStore();
   }
 
   /**
@@ -44,12 +82,12 @@ export class FeatureManager implements FeatureManagerProvider {
    * @param flagName
    * @param defaultValue
    */
-  defineAndStore(flagName: string, defaultValue = true): void {
+  async defineAndStore(flagName: string, defaultValue = true): Promise<void> {
     if (!this.store) {
       throw new Error("No store provider defined");
     }
 
-    this.store.set(flagName, defaultValue);
+    await this.store.set(flagName, defaultValue);
   }
 
   /**

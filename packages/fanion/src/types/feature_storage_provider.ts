@@ -23,4 +23,14 @@ export interface FeatureStorageProvider {
    * @param featureName
    */
   delete(featureName: string): Promise<void>;
+
+  /**
+   * Check if the provider is a database driver
+   */
+  isDatabaseDriver(): boolean;
+
+  /**
+   * Initialise a provider
+   */
+  initStore(): Promise<void>;
 }
