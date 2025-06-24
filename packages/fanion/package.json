@@ -28,8 +28,12 @@
     "lint": "biome lint .",
     "release": "pnpm build && pnpm release-it"
   },
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mgvdev/fanion.git"
+  },
+  "author": "Maxence Guyonvarho <contact@mgvdev.io>",
+  "license": "MIT",
   "packageManager": "pnpm@10.11.0",
   "devDependencies": {},
   "release-it": {
