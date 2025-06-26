@@ -28,7 +28,7 @@ npm i @mgvdev/fanion-adonisjs
 Next, configure the package using the configure command:
 
 ```bash
-node ace configure @fanion/adonisjs
+node ace configure @mgvdev/fanion-adonisjs
 ```
 
 This will:
