@@ -22,7 +22,7 @@ AdonisJS Fanion is the official AdonisJS adapter for the [Fanion](https://github
 ## Installation
 
 ```bash
-npm install @fanion/adonisjs
+npm i @mgvdev/fanion-adonisjs
 ```
 
 Next, configure the package using the configure command:
