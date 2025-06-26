@@ -1,7 +1,7 @@
 {
   "name": "@mgvdev/fanion-adonisjs",
   "description": "AdonisJS adapter for Fanion feature flagging library",
-  "version": "0.1.1-0",
+  "version": "0.1.1",
   "engines": {
     "node": ">=20.6.0"
   },
@@ -47,7 +47,7 @@
   "author": "Maxence Guyonvarho <contact@mgvdev.io>",
   "license": "MIT",
   "dependencies": {
-    "fanion": "workspace:*"
+    "fanion": "^0.6.0"
   },
   "devDependencies": {
     "@adonisjs/assembler": "^7.8.2",
