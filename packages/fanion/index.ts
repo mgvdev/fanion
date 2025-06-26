@@ -9,3 +9,16 @@ export {
   KnexDatabaseDriver,
   createKnexDatabaseDriver,
 } from "./src/drivers/databases/knex.js";
+
+export type {
+  FeatureManagerProvider,
+  FeatureCheck,
+} from "./src/types/provider.js";
+
+export type { FeatureStorageProvider } from "./src/types/feature_storage_provider.js";
+
+export type {
+  DatabaseConfig,
+  DatabaseStorageProvider,
+  KnexConfig,
+} from "./src/types/database_drivers_options.js";
