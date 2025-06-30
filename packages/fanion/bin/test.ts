@@ -1,9 +1,10 @@
-import { expect } from '@japa/expect'
-import { pathToFileURL } from 'node:url'
-import { specReporter } from '@japa/spec-reporter'
-import { processCliArgs, configure, run } from '@japa/runner'
+import { expect } from "@japa/expect";
+import { pathToFileURL } from "node:url";
+import { specReporter } from "@japa/spec-reporter";
+import { processCLIArgs, configure, run } from "@japa/runner";
 
-/*
+(processCLIArgs(process.argv.slice(2)),
+  /*
 |--------------------------------------------------------------------------
 | Configure tests
 |--------------------------------------------------------------------------
@@ -16,15 +17,12 @@ import { processCliArgs, configure, run } from '@japa/runner'
 |
 | Please consult japa.dev/runner-config for the config docs.
 */
-configure({
-  ...processCliArgs(process.argv.slice(2)),
-  ...{
-    files: ['tests/**/*.spec.ts'],
+
+  configure({
+    files: ["tests/**/*.spec.ts"],
     plugins: [expect()],
-    reporters: [specReporter()],
-    importer: (filePath) => import(pathToFileURL(filePath).href),
-  },
-})
+    // reporters: [specReporter()],
+  }));
 
 /*
 |--------------------------------------------------------------------------
@@ -34,4 +32,4 @@ configure({
 | The following "run" method is required to execute all the tests.
 |
 */
-run()
+run();
