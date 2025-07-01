@@ -27,17 +27,14 @@ yarn add fanion
 pnpm add fanion
 ```
 
-For database support, also install Knex and your database driver:
+For database support, also install the appropriate database driver:
 
 ```bash
-# For SQLite
-npm install knex sqlite3
+# For SQL databases (SQLite, PostgreSQL, MySQL)
+npm install knex sqlite3  # or pg, mysql2
 
-# For PostgreSQL
-npm install knex pg
-
-# For MySQL
-npm install knex mysql2
+# For DynamoDB
+npm install @aws-sdk/client-dynamodb @aws-sdk/util-dynamodb
 ```
 
 ### Basic Usage
@@ -117,6 +114,33 @@ const features = await featureManagerWithDatabase({
 features.defineAndStore('persistent-feature', true);
 ```
 
+### Using DynamoDB Storage
+
+```typescript
+import { featureManagerWithDatabase, createDynamoDBDatabaseDriver } from 'fanion';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+
+// Create DynamoDB client
+const dynamoClient = new DynamoDBClient({
+  region: 'us-east-1',
+  // Add other configuration as needed (credentials, endpoint, etc.)
+});
+
+// Create feature manager with DynamoDB storage
+const features = await featureManagerWithDatabase({
+  store: createDynamoDBDatabaseDriver({
+    client: dynamoClient,
+    tableName: 'feature_flags', // optional, defaults to 'feature_flags'
+    featureNameAttribute: 'feature_name', // optional, defaults to 'feature_name'
+    valueAttribute: 'value' // optional, defaults to 'value'
+  })
+});
+
+// The DynamoDB table is automatically created with pay-per-request billing
+// Feature flags are now persisted in DynamoDB
+features.defineAndStore('persistent-feature', true);
+```
+
 ## API Reference
 
 ### FeatureManager
@@ -187,7 +211,7 @@ const memoryStore = createInMemoryDriver();
 const features = featureManager({ store: memoryStore });
 ```
 
-#### Database Driver (Knex)
+#### SQL Database Driver (Knex)
 
 The Knex database driver supports all databases that Knex supports (PostgreSQL, MySQL, SQLite, etc.).
 
@@ -225,6 +249,51 @@ const features = await featureManagerWithDatabase({
 - `tableName`: Name of the database table (optional, defaults to 'feature_flags')
 - `featureNameColumn`: Name of the feature name column (optional, defaults to 'feature_name')
 - `valueColumn`: Name of the value column (optional, defaults to 'value')
+
+#### DynamoDB Driver
+
+The DynamoDB driver uses AWS SDK v3 to connect to Amazon DynamoDB.
+
+```typescript
+import { createDynamoDBDatabaseDriver, featureManagerWithDatabase } from 'fanion';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+
+// Setup DynamoDB client
+const dynamoClient = new DynamoDBClient({
+  region: 'us-east-1',
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+  // For local development with DynamoDB Local
+  // endpoint: 'http://localhost:8000',
+});
+
+// Create DynamoDB driver with custom configuration
+const dynamoDriver = createDynamoDBDatabaseDriver({
+  client: dynamoClient,
+  tableName: 'my_feature_flags',        // defaults to 'feature_flags'
+  featureNameAttribute: 'flag_name',    // defaults to 'feature_name'
+  valueAttribute: 'is_enabled'          // defaults to 'value'
+});
+
+// Initialize feature manager with DynamoDB
+const features = await featureManagerWithDatabase({
+  store: dynamoDriver
+});
+```
+
+**Configuration Options:**
+- `client`: DynamoDB client instance from AWS SDK v3 (required)
+- `tableName`: Name of the DynamoDB table (optional, defaults to 'feature_flags')
+- `featureNameAttribute`: Name of the partition key attribute (optional, defaults to 'feature_name')
+- `valueAttribute`: Name of the value attribute (optional, defaults to 'value')
+
+**DynamoDB Table Structure:**
+The driver automatically creates a table with:
+- Partition key: `feature_name` (or custom attribute name)
+- Pay-per-request billing mode
+- No sort key (simple key-value storage)
 
 #### Custom Storage Provider
 
@@ -487,9 +556,11 @@ export async function getServerSideProps(context) {
 }
 ```
 
-## Database Schema
+## Database Schemas
 
-When using database storage providers, Fanion automatically creates a table with the following structure:
+### SQL Databases (Knex Driver)
+
+When using SQL database storage providers, Fanion automatically creates a table with the following structure:
 
 ```sql
 CREATE TABLE feature_flags (
@@ -500,27 +571,42 @@ CREATE TABLE feature_flags (
 
 The table and column names are configurable through the driver configuration.
 
+### DynamoDB
+
+When using the DynamoDB driver, Fanion automatically creates a table with:
+- **Partition Key**: `feature_name` (String)
+- **Attributes**: `value` (Boolean)
+- **Billing Mode**: Pay-per-request
+- **No sort key**: Simple key-value storage
+
+The table and attribute names are configurable through the driver configuration.
+
 ## Migration from In-Memory to Database Storage
 
 If you're migrating from in-memory storage to database storage, here's how to transition smoothly:
 
 ```typescript
-import { featureManager, featureManagerWithDatabase, createKnexDatabaseDriver } from 'fanion';
+import { featureManager, featureManagerWithDatabase, createKnexDatabaseDriver, createDynamoDBDatabaseDriver } from 'fanion';
 
 // Old in-memory setup
 const oldFeatures = featureManager();
 oldFeatures.define('feature-a', () => true);
 oldFeatures.define('feature-b', (ctx) => ctx.user.isPremium);
 
-// New database setup
-const dbFeatures = await featureManagerWithDatabase({
+// New SQL database setup
+const sqlFeatures = await featureManagerWithDatabase({
   store: createKnexDatabaseDriver({ connection: db })
 });
 
+// Or new DynamoDB setup
+const dynamoFeatures = await featureManagerWithDatabase({
+  store: createDynamoDBDatabaseDriver({ client: dynamoClient })
+});
+
 // Migrate stored flags to database
-dbFeatures.defineAndStore('feature-a', true);
+sqlFeatures.defineAndStore('feature-a', true);
 // Keep dynamic flags as code-based
-dbFeatures.define('feature-b', (ctx) => ctx.user.isPremium);
+sqlFeatures.define('feature-b', (ctx) => ctx.user.isPremium);
 ```
 
 ## Best Practices for Database Storage
@@ -541,6 +627,8 @@ features.define('premium-features', (ctx) => {
 ```
 
 ### 3. Connection Management
+
+**For SQL Databases:**
 ```typescript
 // Good: Reuse database connections
 const db = knex({
@@ -552,6 +640,21 @@ const db = knex({
 // Use the same connection for your app and feature flags
 const features = await featureManagerWithDatabase({
   store: createKnexDatabaseDriver({ connection: db })
+});
+```
+
+**For DynamoDB:**
+```typescript
+// Good: Reuse DynamoDB client
+const dynamoClient = new DynamoDBClient({
+  region: process.env.AWS_REGION,
+  // Configure connection settings, retries, etc.
+  maxAttempts: 3,
+});
+
+// Use the same client for your app and feature flags
+const features = await featureManagerWithDatabase({
+  store: createDynamoDBDatabaseDriver({ client: dynamoClient })
 });
 ```
 
@@ -575,9 +678,11 @@ try {
 - Feature checks are designed to be fast and lightweight
 - Use in-memory storage for high-performance scenarios
 - Database providers automatically create tables and handle upserts efficiently
-- Consider connection pooling for database-backed storage in production
+- Consider connection pooling for SQL database-backed storage in production
+- DynamoDB provides automatic scaling and low-latency access
 - Implement caching for frequently accessed database-backed feature flags
 - Consider the frequency of feature flag evaluations in hot code paths
+- DynamoDB pay-per-request billing is cost-effective for most feature flag workloads
 
 ## Contributing
 

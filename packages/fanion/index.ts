@@ -9,6 +9,10 @@ export {
   KnexDatabaseDriver,
   createKnexDatabaseDriver,
 } from "./src/drivers/databases/knex.js";
+export {
+  DynamoDBDatabaseDriver,
+  createDynamoDBDatabaseDriver,
+} from "./src/drivers/databases/dynamodb.js";
 
 export type {
   FeatureManagerProvider,
@@ -21,4 +25,5 @@ export type {
   DatabaseConfig,
   DatabaseStorageProvider,
   KnexConfig,
+  DynamoDBConfig,
 } from "./src/types/database_drivers_options.js";
